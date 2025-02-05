@@ -1,0 +1,21 @@
+﻿using eStore.DAL.Models;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace eStore.BL.Services
+{
+    public interface ICustomerService
+    {
+        Task<IEnumerable<CustomerDTO>> GetAllCustomers();
+        Task<CustomerDTO> GetCustomerById(int id);
+                  
+        Task<int> AddCustomer(CustomerDTO customerModel);
+        Task<CustomerDTO> UpdateCustomer(CustomerDTO customerModel);
+        Task<int> DeleteCustomer(int id);
+
+    }
+}
