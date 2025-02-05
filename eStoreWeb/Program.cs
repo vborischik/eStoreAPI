@@ -1,8 +1,8 @@
 
-using eStore.DAL.Repositories;      // For ICustomerRepository and CustomerRepository
+using eStore.DAL.Repositories;     
 using AutoMapper;
 using eStore.BL.Services;
-using eStore.Common;
+
 
 
 namespace eStore.Web
@@ -18,6 +18,11 @@ namespace eStore.Web
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddAntiforgery(opt =>
+            {
+                opt.HeaderName = "X-XSRF_TOKEN";
+            });
+
 
             // Register the CustomerRepository with the DI container.
             // Pass IConfiguration and connection string name ("DefaultConnection") to the constructor.
@@ -28,7 +33,7 @@ namespace eStore.Web
             builder.Services.AddScoped<ICustomerService, CustomerService>();
 
             // Register AutoMapper with the MappingProfile from eStore.Common.Mappings.
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));
 
             var app = builder.Build();
 

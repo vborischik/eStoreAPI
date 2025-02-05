@@ -46,7 +46,7 @@ namespace eStore.DAL
             /// <summary>
             /// Executes a query and returns a collection of results.
             /// </summary>
-            protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parameters = null)
+            protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text)
             {
                 using (var connection = CreateConnection())
                 {
@@ -57,22 +57,22 @@ namespace eStore.DAL
             /// <summary>
             /// Executes a query and returns a single result.
             /// </summary>
-            protected async Task<T?> QuerySingleAsync<T>(string sql, object? parameters = null)
+            protected async Task<T?> QuerySingleAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text)
             {
                 using (var connection = CreateConnection())
                 {
-                    return await connection.QuerySingleOrDefaultAsync<T>(sql, parameters);
+                    return await connection.QuerySingleOrDefaultAsync<T>(sql, parameters,commandType:commandType);
                 }
             }
 
             /// <summary>
             /// Executes a non-query command (e.g., INSERT, UPDATE, DELETE).
             /// </summary>
-            protected async Task<int> ExecuteAsync(string sql, object? parameters = null)
+            protected async Task<int> ExecuteAsync(string sql, object? parameters = null,CommandType commandType = CommandType.Text)
             {
                 using (var connection = CreateConnection())
                 {
-                    return await connection.ExecuteAsync(sql, parameters);
+                    return await connection.ExecuteAsync(sql, parameters,commandType:commandType);
                 }
             }
 
@@ -86,40 +86,9 @@ namespace eStore.DAL
                     return await connection.ExecuteScalarAsync<T>(sql, parameters);
                 }
             }
+
+
         }
     }
 }
 
-
-
-
-
-
-//public virtual int DefaultCommandTimeOut
-//{
-//    get { return 1200; }
-//}
-
-//public virtual DbConnection DefaultConnection
-//{
-//    get
-//    {
-//        var connectionString = ConfigurationManager.ConnectionStrings["Default"];
-
-//        return CreateConnection(connectionString);
-//    }
-//}
-
-//public virtual DbConnection CreateConnection(ConnectionStringSettings connectionString)
-//{
-//    var providerName = connectionString.ProviderName;
-
-//    if (string.IsNullOrWhiteSpace(providerName))
-//        providerName = "System.Data.SqlClient";
-
-//    var factory = DbProviderFactories.GetFactory(providerName);
-//    var connection = factory.CreateConnection();
-//    connection.ConnectionString = connectionString.ConnectionString;
-
-//    return connection;
-//}

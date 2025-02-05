@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using eStore.DAL.Models;
 using eStore.DAL.Repositories;
-using eStoreAPI.Areas.Models;
 
 
 namespace eStore.BL.Services
@@ -17,29 +16,52 @@ namespace eStore.BL.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CustomerModel>> GetAllCustomers()
+        public async Task<IEnumerable<CustomerDTO>> GetAllCustomers()
         {
             var customers = await _customerRepository.GetAllCustomers();
-            return _mapper.Map<IEnumerable<CustomerModel>>(customers);
+            return _mapper.Map<IEnumerable<CustomerDTO>>(customers);
         }
 
-        public async Task<CustomerModel> GetCustomerById(int id)
+        public async Task<CustomerDTO> GetCustomerById(int id)
         {
             var customer = await _customerRepository.GetCustomerById(id);
-            return _mapper.Map<CustomerModel>(customer);
+            return _mapper.Map<CustomerDTO>(customer);
         }
 
-        public async Task<int> AddCustomer(CustomerModel customerModel)
+        public async Task<int> AddCustomer(CustomerDTO customerModel)
         {
-            var customer = _mapper.Map<CustomerDTO>(customerModel);
-            return await _customerRepository.AddCustomer(customer);
+
+            var existingCustomer = await _customerRepository.CheckCustomer(customerModel.Email,customerModel.Phone);
+
+            if (existingCustomer != null && existingCustomer.CustomerID != customerModel.CustomerID && existingCustomer.CustomerID!=0)
+            {
+                return 0;// Indicating a conflict
+            }
+
+            return await _customerRepository.AddCustomer(customerModel);
         }
 
-        public async Task<int> UpdateCustomer(CustomerModel customerModel)
+        public async Task<CustomerDTO> UpdateCustomer(CustomerDTO customerModel)
         {
-            var customer = _mapper.Map<CustomerDTO>(customerModel);
-            return await _customerRepository.UpdateCustomer(customer);
+            // Check if another customer has the same email or phone
+            var existingCustomer = await _customerRepository.CheckCustomer(customerModel.Email, customerModel.Phone);
+
+            if (existingCustomer != null && existingCustomer.CustomerID != customerModel.CustomerID && existingCustomer.CustomerID != 0)
+            {
+                return new CustomerDTO { CustomerID = 0 }; // Indicating a conflict
+            }
+
+            var updatedCustomerID = await _customerRepository.UpdateCustomer(customerModel);
+
+            if (updatedCustomerID == 0)
+            {
+                // Handle the case where a duplicate email/phone exists (e.g., return an error response)
+                return new CustomerDTO { CustomerID = 0 };
+            }
+
+            return customerModel;
         }
+
 
         public async Task<int> DeleteCustomer(int id)
         {

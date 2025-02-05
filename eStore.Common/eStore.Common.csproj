@@ -10,9 +10,4 @@
     <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\eStore.DAL\eStore.DAL.csproj" />
-    <ProjectReference Include="..\eStoreWeb\eStore.Web.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -11,9 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eStore.Common\eStore.Common.csproj" />
     <ProjectReference Include="..\eStore.DAL\eStore.DAL.csproj" />
-    <ProjectReference Include="..\eStoreWeb\eStore.Web.csproj" />
+
   </ItemGroup>
 
 </Project>
