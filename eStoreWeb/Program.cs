@@ -17,7 +17,7 @@ namespace eStore.Web
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+          
             builder.Services.AddAntiforgery(opt =>
             {
                 opt.HeaderName = "X-XSRF_TOKEN";
@@ -29,12 +29,15 @@ namespace eStore.Web
             builder.Services.AddScoped<ICustomerRepository>(sp =>
                 new CustomerRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
+
+
             // Register the CustomerService (Business Logic Layer)
             builder.Services.AddScoped<ICustomerService, CustomerService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             // Register AutoMapper with the MappingProfile from eStore.Common.Mappings.
             builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));
-
+            builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
