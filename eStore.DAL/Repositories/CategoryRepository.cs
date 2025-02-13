@@ -34,7 +34,7 @@ namespace eStore.DAL.Repositories
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategory()
         {
-            var sql = "SELECT * FROM Category";
+            var sql = "SELECT * FROM Categories";
             return await QueryAsync<CategoryDTO>(sql);
         }
 

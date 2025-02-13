@@ -29,6 +29,8 @@ namespace eStore.Web
             builder.Services.AddScoped<ICustomerRepository>(sp =>
                 new CustomerRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
+            builder.Services.AddScoped<ICategoryRepository>(sp =>
+               new CategoryRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
 
             // Register the CustomerService (Business Logic Layer)
