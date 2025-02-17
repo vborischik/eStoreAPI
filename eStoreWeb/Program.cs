@@ -23,6 +23,17 @@ namespace eStore.Web
                 opt.HeaderName = "X-XSRF_TOKEN";
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+                }
+                
+                );
 
             // Register the CustomerRepository with the DI container.
             // Pass IConfiguration and connection string name ("DefaultConnection") to the constructor.
