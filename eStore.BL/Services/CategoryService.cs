@@ -27,84 +27,50 @@ namespace eStore.BL.Services
                 return _mapper.Map<IEnumerable<CategoryDTO>>(category);
         }
 
-        public Task<int> AddCategory(CategoryDTO customerModel)
+        public async Task<int> AddCategory(CategoryDTO categoryModel)
         {
-            throw new NotImplementedException();
+
+            var existingCategory= await _categoryRepository.CheckCategory(categoryModel.CategoryName);
+
+            if (existingCategory != null && existingCategory.CategoryID != categoryModel.CategoryID && categoryModel.CategoryID != 0)
+            {
+                return 0;// Indicating a conflict
+            }
+
+
+            return await _categoryRepository.AddCategory(categoryModel);
         }
 
-        public Task<int> DeleteCategory(int id)
+        public async Task<int> DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            return await _categoryRepository.DeleteCategory(id);
         }
 
 
-
-        public Task<CategoryDTO> GetCategoryById(int id)
+        public async Task<CategoryDTO> GetCategoryById(int id)
         {
-            throw new NotImplementedException();
+            var category = await _categoryRepository.GetCategoryById(id);
+            return _mapper.Map<CategoryDTO>(category);
         }
 
-        public Task<CategoryDTO> UpdateCategory(CategoryDTO customerModel)
+        public async Task<CategoryDTO> UpdateCategory(CategoryDTO categoryModel)
         {
-            throw new NotImplementedException();
+            // Check if another category has the same name
+            var existingCategory = await _categoryRepository.CheckCategory(categoryModel.CategoryName);
+            if (existingCategory != null && existingCategory.CategoryID != categoryModel.CategoryID && existingCategory.CategoryID != 0)
+            {
+                return new CategoryDTO { CategoryID = 0 }; // Indicating a conflict
+            }
+
+            var updatedCategoryID = await _categoryRepository.UpdateCategory(categoryModel);
+            if (updatedCategoryID == 0)
+            {
+                // Handle the case where update failed
+                return new CategoryDTO { CategoryID = 0 };
+            }
+
+            return categoryModel;
         }
 
-        //public CategoryService(ICategoryRepository categoryrRepository, IMapper mapper)
-        //{
-        //    _categoryRepository = categoryRepository;
-        //    _mapper = mapper;
-        //}
-
-        //public async Task<IEnumerable<CustomerDTO>> GetAllCategories()
-        //{
-        //    var customers = await _categoryRepository.GetAllCategories();
-        //    return _mapper.Map<IEnumerable<CategoryDTO>>(category);
-        //}
-
-        //public async Task<CustomerDTO> GetCategoryById(int id)
-        //{
-        //    var customer = await _categoryRepository.GetCategoryById(id);
-        //    return _mapper.Map<CategoryDTO>(category);
-        //}
-
-        //public async Task<int> AddCategory(CategoryDTO categoryModel)
-        //{
-
-        //    var existingCategory = await _categoryRepository.CheckCategory(categoryModel.CategoryID, categoryModel.CategoryName);
-
-        //    if (existingCategory != null && existingCategory.CategoryID != categoryModel.CategoryID && existingCategory.CategoryID != 0)
-        //    {
-        //        return 0;// Indicating a conflict
-        //    }
-
-        //    return await _categoryRepository.AddCategory(categoryModel);
-        //}
-
-        //public async Task<CustomerDTO> UpdateCategory(CategoryDTO categoryModel)
-        //{
-        //    // Check if another customer has the same email or phone
-        //    var existingCategory = await _categoryRepository.CheckCategory(categoryModel.CategoryID, categoryModel.CategoryName);
-
-        //    if (existingCategory != null && existingCategory.CategoryID != categoryModel.CategoryID && existingCategory.CategoryID != 0)
-        //    {
-        //        return new CategoryDTO { CategoryID = 0 }; // Indicating a conflict
-        //    }
-
-        //    var updatedCategoryID = await _categoryRepository.UpdateCategory(categoryModel);
-
-        //    if (updatedCategoryID == 0)
-        //    {
-        //        // Handle the case where a duplicate email/phone exists (e.g., return an error response)
-        //        return new CategoryDTO { CategoryID = 0 };
-        //    }
-
-        //    return categoryModel;
-        //}
-
-
-        //public async Task<int> DeleteCategory(int id)
-        //{
-        //    return await _categoryRepository.DeleteCategory(id);
-        //}
     }
 }

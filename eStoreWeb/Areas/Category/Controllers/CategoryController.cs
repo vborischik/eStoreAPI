@@ -35,152 +35,108 @@ namespace eStore.Web.Areas.Customer.Controllers
 
         }
 
-        //// GET: api/customers/{id}
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<CustomerModel>> GetCustomerById(int id)
-        //{
-        //    var customer = await _customerService.GetCustomerById(id);
-        //    if (customer != null)
-        //    {
-        //        var customerModel = _mapper.Map<CustomerModel>(customer);
-        //        return Ok(customerModel);
-        //    }
-        //        return NotFound();
-        //}
+        // GET: api/categories/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryModel>> GetCategoryById(int id)
+        {
+            var category = await _categoryService.GetCategoryById(id);
+            if (category.CategoryID != 0)
+            {
+                var categoryModel = _mapper.Map<CategoryModel>(category);
+                return Ok(categoryModel);
+            }
+            return NotFound();
+        }
 
-        //// POST: api/customers
-        //[HttpPost]
-        ////[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> AddCustomer([FromBody] CustomerModel customerModel)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        // POST: api/categories
+        [HttpPost]
+        public async Task<ActionResult> AddCategory([FromBody] CategoryModel categoryModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //    if (!ValidationHelper.IsValidEmail(customerModel.Email))
-        //    {
-        //        ModelState.AddModelError("Email", "Invalid email format.");
-        //    }
+            try
+            {
+                // Map the incoming presentation model to a domain model.
+                var category = _mapper.Map<CategoryDTO>(categoryModel);
 
-        //    if (!ValidationHelper.IsValidPhone(customerModel.Phone))
-        //    {
-        //        ModelState.AddModelError("Phone", "Invalid phone format.");
-        //    }
+                // Add the category through the business/service layer.
+                int newCategoryId = await _categoryService.AddCategory(category);
+                categoryModel.CategoryID = newCategoryId;
 
-        //    // If any of the custom validations failed, return 400.
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-
-        //    try
-        //    {
-        //        // Map the incoming presentation model to a domain model.
-        //        var customer = _mapper.Map<CategoryDTO>(customerModel);
-
-        //        // Add the customer through the business/service layer.
-        //        int newCustomerId = await _customerService.AddCustomer(customer);
-        //        customerModel.CustomerID = newCustomerId;
-
-
-        //        if (newCustomerId != 0)
-        //        {
-        //            return Ok(customerModel);
-        //        }
-        //        else
-        //        {
-        //            return Ok("email or phone already used");
-        //        }
+                if (newCategoryId != 0)
+                {
+                    return Ok(categoryModel);
+                }
+                else
+                {
+                    return Ok("Category name already exists");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Return a 500 error with a generic error message.
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  "An error occurred while processing your request.");
+            }
+        }
 
 
-        //    }
-        //    catch (Exception ex)          
-        //    { 
+        // PUT: api/categories/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateCategory(int id, [FromBody] CategoryModel categoryModel)
+        {
+            if (id != categoryModel.CategoryID)
+            {
+                return BadRequest("ID mismatch");
+            }
 
-        //        // _logger.LogError(ex, "Error while adding a customer");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //        // Return a 500 error with a generic error message.
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //                          "An error occurred while processing your request.");
-        //    }
+            try
+            {
+                // Map the incoming presentation model to a domain model.
+                var category = _mapper.Map<CategoryDTO>(categoryModel);
 
+                // Update the category through the business/service layer.
+                var updatedCategory = await _categoryService.UpdateCategory(category);
 
-        //}
-
-        //// PUT: api/customers/{id}
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult> UpdateCustomer(int id, [FromBody] CustomerModel customerModel)
-        //{
-        //    if (id != customerModel.CustomerID)
-        //    {
-        //        return BadRequest("ID mismatch");
-        //    }
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (!ValidationHelper.IsValidEmail(customerModel.Email))
-        //    {
-        //        ModelState.AddModelError("Email", "Invalid email format.");
-        //    }
-
-        //    if (!ValidationHelper.IsValidPhone(customerModel.Phone))
-        //    {
-        //        ModelState.AddModelError("Phone", "Invalid phone format.");
-        //    }
-
-        //    // If any of the custom validations failed, return 400.
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+                if (updatedCategory.CategoryID != 0)
+                {
+                    return Ok(updatedCategory);
+                }
+                else
+                {
+                    return BadRequest("Category name already exists");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Return a 400 error with the exception message.
+                return BadRequest(ex.Message);
+            }
+        }
 
 
-        //    try
-        //    {
-        //        // Map the incoming presentation model to a domain model.
-        //        var customer = _mapper.Map<CategoryDTO>(customerModel);
+        // DELETE: api/categories/{id}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                await _categoryService.DeleteCategory(id);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
-        //        // Add the customer through the business/service layer.
-        //        var updatedcustomer = await _customerService.UpdateCustomer(customer);
-
-        //        if (updatedcustomer.CustomerID!=0) {
-        //            return Ok(updatedcustomer);
-        //        }
-        //        else
-        //        {
-        //            return BadRequest("Phone or Email already used");
-        //        }
-        //        // Here, assuming that after creation, customer.CustomerID is populated.
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        // Return a 500 error with a generic error message.
-        //        return BadRequest(ex.Message);
-        //    }
-
-        //}
-
-        //// DELETE: api/customers/{id}
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult> DeleteCustomer(int id)
-        //{
-        //    try
-        //    {
-        //        await _customerService.DeleteCustomer(id);
-        //        return Ok();
-        //    }
-        //    catch
-        //    {
-        //        return BadRequest();
-        //    }
-
-
-        //}
     }
 }

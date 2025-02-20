@@ -11,9 +11,9 @@ namespace eStore.DAL.Repositories
     {
         Task<IEnumerable<CategoryDTO>> GetAllCategories();
         Task<CategoryDTO> GetCategoryById(int id);
-        Task<CategoryDTO> CheckCategory(string email, string phone);
-        Task<int> AddCategory(CategoryDTO customer);
-        Task<int> UpdateCategory(CategoryDTO customer);
+        Task<CategoryDTO> CheckCategory(string categoryName);
+        Task<int> AddCategory(CategoryDTO category);
+        Task<int> UpdateCategory(CategoryDTO category);
         Task<int> DeleteCategory(int id);
     }
 }
