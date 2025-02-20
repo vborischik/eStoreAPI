@@ -10,6 +10,7 @@ namespace eStoreAPI.Common
         {
             // Map between DAL model and Web model
             CreateMap<CustomerDTO, CustomerModel>().ReverseMap();
+            CreateMap<CategoryDTO, CategoryModel>().ReverseMap();
         }
     }
 }

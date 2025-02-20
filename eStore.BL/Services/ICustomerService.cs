@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace eStore.BL.Services
 {
-    public interface ICustomerService
-    {
-        Task<IEnumerable<CustomerDTO>> GetAllCustomers();
-        Task<CustomerDTO> GetCustomerById(int id);
-                  
-        Task<int> AddCustomer(CustomerDTO customerModel);
-        Task<CustomerDTO> UpdateCustomer(CustomerDTO customerModel);
-        Task<int> DeleteCustomer(int id);
+   public interface ICustomerService
+{
+    Task<IEnumerable<CustomerDTO>> GetAllCustomers();
+    Task<CustomerDTO> GetCustomerById(int id);
+              
+    Task<int> AddCustomer(CustomerDTO customerModel);
+    Task<CustomerDTO> UpdateCustomer(CustomerDTO customerModel);
+    Task<int> DeleteCustomer(int id);
 
-    }
+}
 }
