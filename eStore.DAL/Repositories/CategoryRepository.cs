@@ -17,35 +17,59 @@ namespace eStore.DAL.Repositories
         {
         }
 
-        public Task<int> AddCategory(CategoryDTO customer)
+        public async Task<int> AddCategory(CategoryDTO category)
         {
-            throw new NotImplementedException();
+
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@FirstName", category.CategoryName);
+            parameters.Add("p_CategoryID", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            await ExecuteAsync("AddCustomer", parameters, commandType: CommandType.StoredProcedure);
+
+            return parameters.Get<int>("p_CategoryID");
+
+
         }
 
-        public Task<CategoryDTO> CheckCategory(string email, string phone)
+        public async Task<CategoryDTO> CheckCategory(string categoryName)
         {
-            throw new NotImplementedException();
+            var sql = "SELECT * FROM Categories WHERE CategoryName = @categoryName LIMIT 1;";
+
+            return await QuerySingleAsync<CategoryDTO>(sql, new { CategoryName = categoryName}) ?? new CategoryDTO();
         }
 
-        public Task<int> DeleteCategory(int id)
+        public async Task<int> DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            var sql = "DELETE FROM Categories WHERE CategoryID = @Id";
+            return await ExecuteAsync(sql, new { Id = id });
         }
 
-        public async Task<IEnumerable<CategoryDTO>> GetAllCategory()
+        public async Task<IEnumerable<CategoryDTO>> GetAllCategories()
         {
             var sql = "SELECT * FROM Categories";
             return await QueryAsync<CategoryDTO>(sql);
         }
 
-        public Task<CategoryDTO> GetCategoryById(int id)
+        public async Task<CategoryDTO> GetCategoryById(int id)
         {
-            throw new NotImplementedException();
+            var sql = "SELECT * FROM Categories WHERE CategoryID = @Id";
+            return await QuerySingleAsync<CategoryDTO>(sql, new { Id = id }) ?? new CategoryDTO();
         }
 
-        public Task<int> UpdateCategory(CategoryDTO customer)
+        public async Task<int> UpdateCategory(CategoryDTO category)
         {
-            throw new NotImplementedException();
+            var parameters = new DynamicParameters();
+            parameters.Add("p_Category", category.CategoryID, DbType.Int32);
+            parameters.Add("p_FirstName", category.CategoryName, DbType.String);
+
+            var t = await ExecuteAsync(
+                "UpdateCategory",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+
+            return t;
         }
     }
 }

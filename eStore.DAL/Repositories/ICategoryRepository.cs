@@ -9,7 +9,7 @@ namespace eStore.DAL.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<IEnumerable<CategoryDTO>> GetAllCategory();
+        Task<IEnumerable<CategoryDTO>> GetAllCategories();
         Task<CategoryDTO> GetCategoryById(int id);
         Task<CategoryDTO> CheckCategory(string email, string phone);
         Task<int> AddCategory(CategoryDTO customer);

@@ -23,7 +23,7 @@ namespace eStore.BL.Services
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategories()
         {
-            var category = await _categoryRepository.GetAllCategory();
+            var category = await _categoryRepository.GetAllCategories();
                 return _mapper.Map<IEnumerable<CategoryDTO>>(category);
         }
 
