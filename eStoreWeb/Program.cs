@@ -43,10 +43,14 @@ namespace eStore.Web
             builder.Services.AddScoped<ICategoryRepository>(sp =>
                new CategoryRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
+            builder.Services.AddScoped<IProductRepository>(sp =>
+              new ProductRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
+
 
             // Register the CustomerService (Business Logic Layer)
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             // Register AutoMapper with the MappingProfile from eStore.Common.Mappings.
             builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));

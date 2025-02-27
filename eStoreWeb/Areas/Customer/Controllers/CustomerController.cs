@@ -25,14 +25,39 @@ namespace eStore.Web.Areas.Customer.Controllers
 
         // GET: api/customers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CustomerModel>>> GetAllCustomers()
+        public async Task<ActionResult> GetAllCustomers(int pageNumber = 1, int pageSize = 50)
         {
-            //// Retrieve domain models from BL service.
-            var customers = await _customerService.GetAllCustomers();
-            //// Map them to presentation models.
+            if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest("Page number must be greater than zero, and page size must be between 1 and 100.");
+            }
+
+            //// Retrieve paginated customer list
+            var (customers, totalRecords) = await _customerService.GetAllCustomers(pageNumber, pageSize);
+
+            //// Map domain models to presentation models
             var customerModels = _mapper.Map<IEnumerable<CustomerModel>>(customers);
-            return Ok(customerModels);
+
+            //// Return paginated response with total count
+            return Ok(new
+            {
+                TotalCount = totalRecords,
+                Customers = customerModels
+            });
         }
+
+
+        //// GET: api/customers
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<CustomerModel>>> GetAllCustomers()
+        //{
+        //    //// Retrieve domain models from BL service.
+        //    var customers = await _customerService.GetAllCustomers();
+        //    //// Map them to presentation models.
+        //    var customerModels = _mapper.Map<IEnumerable<CustomerModel>>(customers);
+        //    return Ok(customerModels);
+        //}
+
 
         // GET: api/customers/{id}
         [HttpGet("{id}")]
@@ -49,7 +74,7 @@ namespace eStore.Web.Areas.Customer.Controllers
 
         // POST: api/customers
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddCustomer([FromBody] CustomerModel customerModel)
         {
             if (!ModelState.IsValid)
@@ -110,6 +135,7 @@ namespace eStore.Web.Areas.Customer.Controllers
 
         // PUT: api/customers/{id}
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateCustomer(int id, [FromBody] CustomerModel customerModel)
         {
             if (id != customerModel.CustomerID)

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eStore.DAL.Models;
 using eStore.Web.Areas.Customer.Models;
+using eStore.Web.Areas.Product.Models;
 
 namespace eStoreAPI.Common
 {
@@ -11,6 +12,7 @@ namespace eStoreAPI.Common
             // Map between DAL model and Web model
             CreateMap<CustomerDTO, CustomerModel>().ReverseMap();
             CreateMap<CategoryDTO, CategoryModel>().ReverseMap();
+            CreateMap<ProductDTO, ProductModel>().ReverseMap();
         }
     }
 }

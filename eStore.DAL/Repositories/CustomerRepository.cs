@@ -44,6 +44,18 @@ public class CustomerRepository : BaseDAL, ICustomerRepository
         return await QueryAsync<CustomerDTO>(sql);
     }
 
+    public async Task<IEnumerable<CustomerDTO>> GetAllCustomers(int pageNumber, int pageSize)
+    {
+        var sql = "SELECT * FROM Customers ORDER BY CustomerID LIMIT @PageSize OFFSET @Offset";
+        return await QueryAsync<CustomerDTO>(sql, new { PageSize = pageSize, Offset = (pageNumber - 1) * pageSize });
+    }
+
+    public async Task<int> GetTotalCustomerCount()
+    {
+        var sql = "SELECT COUNT(*) FROM Customers";
+        return await QuerySingleAsync<int>(sql);
+    }
+
     public async Task<CustomerDTO> GetCustomerById(int id)
     {
         var sql = "SELECT * FROM Customers WHERE CustomerId = @Id";

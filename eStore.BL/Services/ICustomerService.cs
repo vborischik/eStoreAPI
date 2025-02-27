@@ -16,6 +16,8 @@ namespace eStore.BL.Services
     Task<int> AddCustomer(CustomerDTO customerModel);
     Task<CustomerDTO> UpdateCustomer(CustomerDTO customerModel);
     Task<int> DeleteCustomer(int id);
+    Task<CustomerDTO> CheckCustomer(string email, string phone);
+    Task<(IEnumerable<CustomerDTO>, int)> GetAllCustomers(int pageNumber, int pageSize); // New method for pagination 
 
-}
+    }
 }
