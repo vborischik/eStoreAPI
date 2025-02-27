@@ -22,6 +22,15 @@ namespace eStore.BL.Services
             return _mapper.Map<IEnumerable<CustomerDTO>>(customers);
         }
 
+        public async Task<(IEnumerable<CustomerDTO>, int)> GetAllCustomers(int pageNumber, int pageSize)
+        {
+            var customers = await _customerRepository.GetAllCustomers(pageNumber, pageSize);
+            var totalRecords = await _customerRepository.GetTotalCustomerCount(); // Fetch total records separately
+
+            return (customers, totalRecords);
+        }
+
+
         public async Task<CustomerDTO> GetCustomerById(int id)
         {
             var customer = await _customerRepository.GetCustomerById(id);
@@ -31,7 +40,7 @@ namespace eStore.BL.Services
         public async Task<int> AddCustomer(CustomerDTO customerModel)
         {
 
-            var existingCustomer = await _customerRepository.CheckCustomer(customerModel.Email,customerModel.Phone);
+            var existingCustomer = await CheckCustomer(customerModel.Email,customerModel.Phone);
 
             if (existingCustomer != null && existingCustomer.CustomerID != customerModel.CustomerID && existingCustomer.CustomerID!=0)
             {
@@ -67,6 +76,12 @@ namespace eStore.BL.Services
         {
             return await _customerRepository.DeleteCustomer(id);
         }
+
+        public async Task<CustomerDTO> CheckCustomer(string email, string phone)
+        {
+            return await _customerRepository.CheckCustomer(email, phone);
+        }
+
 
 
     }
