@@ -68,7 +68,7 @@ namespace eStore.Web
                 app.UseSwaggerUI();
             }
 
-            app.UseCors(options => { options.AllowAnyOrigin();options.AllowAnyHeader();options.AllowAnyMethod(); });
+            app.UseCors("AllowAll");
 
             app.Use(async (context, next) =>
             {
