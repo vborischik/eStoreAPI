@@ -2,6 +2,8 @@
 using eStore.DAL.Repositories;     
 using AutoMapper;
 using eStore.BL.Services;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Antiforgery;
 
 
 
@@ -18,9 +20,11 @@ namespace eStore.Web
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
           
-            builder.Services.AddAntiforgery(opt =>
+            builder.Services.AddAntiforgery(options =>
             {
-                opt.HeaderName = "X-XSRF_TOKEN";
+                options.HeaderName = "X-XSRF_TOKEN";
+                options.Cookie.Name = "XSRF-TOKEN";
+                options.Cookie.HttpOnly = false;
             });
 
             builder.Services.AddCors(options =>
@@ -66,7 +70,17 @@ namespace eStore.Web
 
             app.UseCors(options => { options.AllowAnyOrigin();options.AllowAnyHeader();options.AllowAnyMethod(); });
 
-            
+            app.Use(async (context, next) =>
+            {
+                var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+              
+                if (context.Request.Method == "GET")
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                }
+                await next(context);
+            });
+
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
