@@ -1,11 +1,8 @@
-
-using eStore.DAL.Repositories;     
+using eStore.DAL.Repositories;
 using AutoMapper;
 using eStore.BL.Services;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Antiforgery;
-
-
+using Microsoft.Extensions.Options;
 
 namespace eStore.Web
 {
@@ -17,48 +14,46 @@ namespace eStore.Web
 
             // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-          
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-XSRF_TOKEN";
-                options.Cookie.Name = "XSRF-TOKEN";
-                options.Cookie.HttpOnly = false;
-            });
+            builder.Services.AddSwaggerGen();
 
+            // Enable CORS (Allow All)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
                     policy.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
                 });
-                }
-                
-                );
+            });
 
-            // Register the CustomerRepository with the DI container.
-            // Pass IConfiguration and connection string name ("DefaultConnection") to the constructor.
+            // Антифрод-защита (если нужна)
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.Cookie.Name = "XSRF-TOKEN";
+                options.Cookie.HttpOnly = false;
+            });
+
+            // Регистрация репозиториев
             builder.Services.AddScoped<ICustomerRepository>(sp =>
                 new CustomerRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
             builder.Services.AddScoped<ICategoryRepository>(sp =>
-               new CategoryRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
+                new CategoryRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
             builder.Services.AddScoped<IProductRepository>(sp =>
-              new ProductRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
+                new ProductRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
-
-            // Register the CustomerService (Business Logic Layer)
+            // Регистрация сервисов
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-            // Register AutoMapper with the MappingProfile from eStore.Common.Mappings.
+            // Регистрация AutoMapper
             builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));
-            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -68,12 +63,19 @@ namespace eStore.Web
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("AllowAll");
+            app.UseHttpsRedirection();
+            
+            app.UseRouting(); // 👈 Добавил правильный порядок
+            
+            app.UseCors("AllowAll"); // 👈 Вызван перед UseAuthorization
 
+            app.UseAuthorization();
+            
+            // Если нужен Antiforgery, можно оставить этот код
             app.Use(async (context, next) =>
             {
                 var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
-              
+
                 if (context.Request.Method == "GET")
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
@@ -81,9 +83,8 @@ namespace eStore.Web
                 await next(context);
             });
 
-            app.UseHttpsRedirection();
-            app.UseAuthorization();
             app.MapControllers();
+
             app.Run();
         }
     }
