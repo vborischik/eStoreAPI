@@ -26,13 +26,25 @@ namespace eStore.Web.Areas.Product.Controllers
 
         // GET: api/products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductModel>>> GetAllProducts()
+        public async Task<ActionResult> GetAllProducts(int pageNumber = 1, int pageSize = 50)
         {
-            // Retrieve domain models from BL service.
-            var products = await _productService.GetAllProducts();
-            // Map them to presentation models.
+            if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest("Page number must be greater than zero, and page size must be between 1 and 100.");
+            }
+
+            // Retrieve paginated product list
+            var (products, totalRecords) = await _productService.GetAllProducts(pageNumber, pageSize);
+
+            // Map domain models to presentation models
             var productModels = _mapper.Map<IEnumerable<ProductModel>>(products);
-            return Ok(productModels);
+
+            // Return paginated response with total count
+            return Ok(new
+            {
+                TotalCount = totalRecords,
+                Products = productModels
+            });
         }
 
         // GET: api/products/{id}

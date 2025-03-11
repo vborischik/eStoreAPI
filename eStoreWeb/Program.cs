@@ -66,11 +66,12 @@ namespace eStore.Web
             app.UseHttpsRedirection();
             
             app.UseRouting(); // 👈 Добавил правильный порядок
-            
-            app.UseCors("AllowAll"); // 👈 Вызван перед UseAuthorization
+
+            app.UseCors(options => { options.AllowAnyOrigin(); options.AllowAnyHeader(); options.AllowAnyMethod(); });
+
 
             app.UseAuthorization();
-            
+
             // Если нужен Antiforgery, можно оставить этот код
             app.Use(async (context, next) =>
             {

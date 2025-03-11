@@ -15,6 +15,7 @@ namespace eStore.BL.Services
         Task<(int productId, string errorMessage)> AddProduct(ProductDTO productModel);
         Task<ProductDTO> UpdateProduct(ProductDTO productModel);
         Task<int> DeleteProduct(int id);
+        Task<(IEnumerable<ProductDTO>, int)> GetAllProducts(int pageNumber, int pageSize);
 
     }
 }
