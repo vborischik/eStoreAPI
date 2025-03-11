@@ -78,5 +78,17 @@ namespace eStore.DAL.Repositories
             );
             return result;
         }
+
+        public async Task<IEnumerable<ProductDTO>> GetAllProducts(int pageNumber, int pageSize)
+        {
+            var sql = "SELECT * FROM Products ORDER BY ProductID LIMIT @PageSize OFFSET @Offset";
+            return await QueryAsync<ProductDTO>(sql, new { PageSize = pageSize, Offset = (pageNumber - 1) * pageSize });
+        }
+
+        public async Task<int> GetTotalProductCount()
+        {
+            var sql = "SELECT COUNT(*) FROM Products";
+            return await QuerySingleAsync<int>(sql);
+        }
     }
 }

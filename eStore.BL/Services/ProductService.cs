@@ -23,7 +23,6 @@ namespace eStore.BL.Services
             _categoryRepository = categoryRepository;
         }
 
-
         public async Task<(int productId, string errorMessage)> AddProduct(ProductDTO productModel)
         {
             // Check if product with same UPC or SKU already exists
@@ -55,6 +54,13 @@ namespace eStore.BL.Services
             var products = await _productRepository.GetAllProducts();
             return _mapper.Map<IEnumerable<ProductDTO>>(products);
         }
+        public async Task<(IEnumerable<ProductDTO>, int)> GetAllProducts(int pageNumber, int pageSize)
+        {
+            var products = await _productRepository.GetAllProducts(pageNumber, pageSize);
+            var totalRecords = await _productRepository.GetTotalProductCount();
+
+            return (products, totalRecords);
+        }
 
         public async Task<ProductDTO> GetProductById(int id)
         {
@@ -79,5 +85,7 @@ namespace eStore.BL.Services
             }
             return productModel;
         }
+
+        
     }
 }

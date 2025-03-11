@@ -11,11 +11,13 @@ namespace eStore.DAL.Repositories
     {
 
         Task<IEnumerable<ProductDTO>> GetAllProducts();
+        Task<IEnumerable<ProductDTO>> GetAllProducts(int pageNumber, int pageSize);
         Task<ProductDTO> GetProductById(int id);
         Task<ProductDTO> CheckProduct(string UPC, string SKU);
         Task<int> AddProduct(ProductDTO product);
         Task<int> UpdateProduct(ProductDTO product);
-        Task<int> DeleteProduct(int id);
+        Task<int> DeleteProduct(int id);       
+        Task<int> GetTotalProductCount();
 
     }
 }
