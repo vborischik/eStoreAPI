@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /eStoreWeb/appsettings.json
 /eStoreWeb/appsettings.Development.json
+.vscode/launch.json
+.vscode/tasks.json
+.DS_Store

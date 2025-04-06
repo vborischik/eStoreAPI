@@ -2,6 +2,7 @@
 using eStore.DAL.Models;
 using eStore.Web.Areas.Customer.Models;
 using eStore.Web.Areas.Product.Models;
+using eStore.Web.Areas.Order.Models;
 
 namespace eStoreAPI.Common
 {
@@ -13,6 +14,7 @@ namespace eStoreAPI.Common
             CreateMap<CustomerDTO, CustomerModel>().ReverseMap();
             CreateMap<CategoryDTO, CategoryModel>().ReverseMap();
             CreateMap<ProductDTO, ProductModel>().ReverseMap();
+            CreateMap<OrderDTO, OrderModel>().ReverseMap();
         }
     }
 }

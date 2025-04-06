@@ -46,10 +46,14 @@ namespace eStore.Web
             builder.Services.AddScoped<IProductRepository>(sp =>
                 new ProductRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
+            builder.Services.AddScoped<IOrderRepository>(sp =>
+                new OrderRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
+
             // Регистрация сервисов
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             // Регистрация AutoMapper
             builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));

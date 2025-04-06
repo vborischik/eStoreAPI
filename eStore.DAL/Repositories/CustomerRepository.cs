@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Data;
 
+namespace eStore.DAL.Repositories
+{
 public class CustomerRepository : BaseDAL, ICustomerRepository
 {
     // No need for a separate _dbConnection field as BaseDAL handles connection creation.
@@ -93,4 +95,5 @@ public class CustomerRepository : BaseDAL, ICustomerRepository
     }
 
 
+}
 }
