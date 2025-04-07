@@ -3,6 +3,8 @@ using AutoMapper;
 using eStore.BL.Services;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 namespace eStore.Web
 {
@@ -15,7 +17,34 @@ namespace eStore.Web
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            // Swagger with JWT support
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "eStore API", Version = "v1" });
+
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Enter only the JWT Bearer token (no 'Bearer' prefix)",
+
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
+                });
+            });
 
             // Enable CORS (Allow All)
             builder.Services.AddCors(options =>
@@ -28,7 +57,18 @@ namespace eStore.Web
                 });
             });
 
-            // Антифрод-защита (если нужна)
+            // Add Auth0 Authentication
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://testmyfirstapp.us.auth0.com/";
+                options.Audience = "https://api.local.dev";
+            });
+
+            // Antiforgery (optional for APIs)
             builder.Services.AddAntiforgery(options =>
             {
                 options.HeaderName = "X-XSRF-TOKEN";
@@ -36,7 +76,7 @@ namespace eStore.Web
                 options.Cookie.HttpOnly = false;
             });
 
-            // Регистрация репозиториев
+            // Repositories
             builder.Services.AddScoped<ICustomerRepository>(sp =>
                 new CustomerRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
@@ -46,12 +86,24 @@ namespace eStore.Web
             builder.Services.AddScoped<IProductRepository>(sp =>
                 new ProductRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
 
-            // Регистрация сервисов
+            builder.Services.AddScoped<IOrderDetailRepository>(sp =>
+                new OrderDetailRepository(sp.GetRequiredService<IConfiguration>(), "DefaultConnection"));
+
+            builder.Services.AddScoped<IOrderRepository>(sp =>
+                 new OrderRepository(
+                      sp.GetRequiredService<IConfiguration>(),
+                      "DefaultConnection",
+                      sp.GetRequiredService<IOrderDetailRepository>()
+                  ));
+
+            // Services
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 
-            // Регистрация AutoMapper
+            // AutoMapper
             builder.Services.AddAutoMapper(typeof(eStoreAPI.Common.MappingProfile));
 
             var app = builder.Build();
@@ -64,15 +116,15 @@ namespace eStore.Web
             }
 
             app.UseHttpsRedirection();
-            
-            app.UseRouting(); // 👈 Добавил правильный порядок
 
-            app.UseCors(options => { options.AllowAnyOrigin(); options.AllowAnyHeader(); options.AllowAnyMethod(); });
+            app.UseRouting();
 
+            app.UseCors("AllowAll");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            // Если нужен Antiforgery, можно оставить этот код
+            // Optional antiforgery token generator for frontend integration
             app.Use(async (context, next) =>
             {
                 var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();

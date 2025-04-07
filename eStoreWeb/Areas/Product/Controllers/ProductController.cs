@@ -3,6 +3,7 @@ using eStore.BL.Helpers;
 using eStore.BL.Services;
 using eStore.DAL.Models;
 using eStore.Web.Areas.Product.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace eStore.Web.Areas.Product.Controllers
     [Area("Admin")]
     [Route("/api/products")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
 

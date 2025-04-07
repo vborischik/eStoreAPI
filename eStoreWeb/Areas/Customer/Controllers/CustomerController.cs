@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using eStore.DAL.Models;
 using eStore.Web.Areas.Customer.Models;
 using eStore.BL.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eStore.Web.Areas.Customer.Controllers
 {
     [Area("Customer")]
     [Route("/api/customers")]
     [ApiController]
+    [Authorize]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using eStore.DAL.Models;
 using eStore.Web.Areas.Customer.Models;
 using eStore.BL.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eStore.Web.Areas.Customer.Controllers
 {
     [Area("Category")]
     [Route("/api/categories")]
     [ApiController]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
