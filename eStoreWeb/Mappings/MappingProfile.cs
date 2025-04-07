@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eStore.DAL.Models;
 using eStore.Web.Areas.Customer.Models;
+using eStore.Web.Areas.Order.Models;
 using eStore.Web.Areas.Product.Models;
 
 namespace eStoreAPI.Common
@@ -13,6 +14,9 @@ namespace eStoreAPI.Common
             CreateMap<CustomerDTO, CustomerModel>().ReverseMap();
             CreateMap<CategoryDTO, CategoryModel>().ReverseMap();
             CreateMap<ProductDTO, ProductModel>().ReverseMap();
+            CreateMap<OrderDetailDTO, OrderDetailModel>().ReverseMap();
+            CreateMap<OrderDTO, OrderModel>().ReverseMap();
+
         }
     }
 }
