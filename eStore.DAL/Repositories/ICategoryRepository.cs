@@ -15,5 +15,8 @@ namespace eStore.DAL.Repositories
         Task<int> AddCategory(CategoryDTO category);
         Task<int> UpdateCategory(CategoryDTO category);
         Task<int> DeleteCategory(int id);
+
+        Task<IEnumerable<CategoryDTO>> GetAllCategories(int pageNumber, int pageSize);
+        Task<int> GetTotalCategoryCount();
     }
 }

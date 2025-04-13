@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace eStore.Web
 {
@@ -51,9 +52,10 @@ namespace eStore.Web
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                    policy.WithOrigins("http://localhost:4200")
+                      .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
                 });
             });
 
@@ -66,6 +68,22 @@ namespace eStore.Web
             {
                 options.Authority = "https://testmyfirstapp.us.auth0.com/";
                 options.Audience = "https://api.local.dev";
+
+             options.TokenValidationParameters = new TokenValidationParameters
+{
+    NameClaimType = "name",
+    RoleClaimType = "roles"
+};
+
+                options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("AUTH FAILED: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
+    };
+
             });
 
             // Antiforgery (optional for APIs)

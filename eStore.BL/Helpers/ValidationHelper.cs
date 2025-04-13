@@ -39,7 +39,7 @@ namespace eStore.BL.Helpers
         {
             if (string.IsNullOrWhiteSpace(phone))
                 return false;
-
+            phone = phone.Replace("-", "");
             var regex = new Regex(@"^\+?\d{10,15}$");
             return regex.IsMatch(phone);
         }

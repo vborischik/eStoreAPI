@@ -18,6 +18,8 @@ namespace eStore.DAL.Repositories
         Task<int> AddOrder(OrderDTO order);
         Task<int> UpdateOrderStatus(int orderId, string status);
         Task<int> DeleteOrder(int id);
+        Task<int> UpdateOrder(OrderDTO order);
+
 
     }
 }

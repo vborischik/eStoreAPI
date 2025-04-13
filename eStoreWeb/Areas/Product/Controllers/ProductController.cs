@@ -25,6 +25,21 @@ namespace eStore.Web.Areas.Product.Controllers
             _mapper = mapper;
         }
 
+// // GET: api/products
+[HttpGet("list")]
+    public async Task<ActionResult<IEnumerable<object>>> GetProductList()
+    {
+        var (products, _) = await _productService.GetAllProducts(1, int.MaxValue);
+        var productList = products.Select(p => new
+        {
+            Id = p.ProductID,
+            Name = p.ProductName,
+            Price = p.Price
+        });
+
+        return Ok(productList);
+    }
+
 
         // GET: api/products
         [HttpGet]
@@ -159,6 +174,8 @@ namespace eStore.Web.Areas.Product.Controllers
                 return BadRequest();
             }
         }
+
+
 
 
     }

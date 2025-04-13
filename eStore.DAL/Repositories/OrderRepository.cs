@@ -56,33 +56,58 @@ namespace eStore.DAL.Repositories
             return await ExecuteAsync(sql, new { Id = id });
         }
 
-        public async Task<IEnumerable<OrderDTO>> GetAllOrders()
-        {
-            var sql = "SELECT * FROM Orders ORDER BY OrderDate DESC";
-            var orders = await QueryAsync<OrderDTO>(sql);
+public async Task<IEnumerable<OrderDTO>> GetAllOrders()
+{
+    var sql = @"
+        SELECT
+            o.OrderID,
+            o.CustomerID,
+            o.OrderDate,
+            o.TotalAmount,
+            o.OrderStatus,
+            CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName
+        FROM Orders o
+        INNER JOIN Customers c ON o.CustomerID = c.CustomerID
+        ORDER BY o.OrderDate DESC";
 
-            // Populate order details for each order
-            foreach (var order in orders)
-            {
-                order.OrderDetails = (await _orderDetailRepository.GetOrderDetailsByOrderId(order.OrderID)).ToList();
-            }
+    var orders = await QueryAsync<OrderDTO>(sql);
 
-            return orders;
-        }
+    // Populate order details
+    foreach (var order in orders)
+    {
+        order.OrderDetails = (await _orderDetailRepository.GetOrderDetailsByOrderId(order.OrderID)).ToList();
+    }
 
-        public async Task<IEnumerable<OrderDTO>> GetAllOrders(int pageNumber, int pageSize)
-        {
-            var sql = "SELECT * FROM Orders ORDER BY OrderDate DESC LIMIT @PageSize OFFSET @Offset";
-            var orders = await QueryAsync<OrderDTO>(sql, new { PageSize = pageSize, Offset = (pageNumber - 1) * pageSize });
+    return orders;
+}
 
-            // Populate order details for each order
-            //foreach (var order in orders)
-            //{
-            //    order.OrderDetails = (await _orderDetailRepository.GetOrderDetailsByOrderId(order.OrderID)).ToList();
-            //}
 
-            return orders;
-        }
+      public async Task<IEnumerable<OrderDTO>> GetAllOrders(int pageNumber, int pageSize)
+{
+    var sql = @"
+        SELECT
+            o.OrderID,
+            o.CustomerID,
+            o.OrderDate,
+            o.TotalAmount,
+            o.OrderStatus,
+            CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName
+        FROM Orders o
+        INNER JOIN Customers c ON o.CustomerID = c.CustomerID
+        ORDER BY o.OrderDate DESC
+        LIMIT @PageSize OFFSET @Offset";
+
+    var orders = await QueryAsync<OrderDTO>(sql, new { PageSize = pageSize, Offset = (pageNumber - 1) * pageSize });
+
+    // Optionally load order details
+    // foreach (var order in orders)
+    // {
+    //     order.OrderDetails = (await _orderDetailRepository.GetOrderDetailsByOrderId(order.OrderID)).ToList();
+    // }
+
+    return orders;
+}
+
 
         public async Task<int> GetTotalOrderCount()
         {
@@ -129,5 +154,31 @@ namespace eStore.DAL.Repositories
                 commandType: CommandType.StoredProcedure
             );
         }
+
+        public async Task<int> UpdateOrder(OrderDTO order)
+{
+    var orderSql = @"
+        UPDATE Orders
+        SET CustomerID = @CustomerID,
+            OrderDate = @OrderDate,
+            TotalAmount = @TotalAmount,
+            OrderStatus = @OrderStatus
+        WHERE OrderID = @OrderID";
+
+    var affected = await ExecuteAsync(orderSql, new
+    {
+        order.CustomerID,
+        order.OrderDate,
+        order.TotalAmount,
+        OrderStatus = order.OrderStatus.ToString(),
+        order.OrderID
+    });
+
+    // Возможность добавить логику по OrderDetails, если нужно
+
+    return affected > 0 ? order.OrderID : 0;
+}
+
+
     }
 }

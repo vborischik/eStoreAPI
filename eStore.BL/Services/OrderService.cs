@@ -42,10 +42,10 @@ namespace eStore.BL.Services
                 }
 
                 // Set the price from the current product price
-                detail.Price = product.Price;
+                detail.UnitPrice = product.Price;
 
                 // Add to total
-                totalAmount += detail.Price * detail.Quantity;
+                totalAmount += detail.UnitPrice * detail.Quantity;
             }
 
             // Update the order total
@@ -104,5 +104,26 @@ namespace eStore.BL.Services
             var result = await _orderRepository.UpdateOrderStatus(orderId, status);
             return result > 0;
         }
+
+        public async Task<int?> UpdateOrder(OrderDTO order)
+{
+    decimal totalAmount = 0;
+    foreach (var detail in order.OrderDetails)
+    {
+        var product = await _productRepository.GetProductById(detail.ProductID);
+        if (product == null)
+            throw new Exception($"Product with ID {detail.ProductID} not found");
+
+        detail.UnitPrice = product.Price;
+        totalAmount += product.Price * detail.Quantity;
+    }
+
+    order.TotalAmount = totalAmount;
+
+    var result = await _orderRepository.UpdateOrder(order);
+    return result > 0 ? order.OrderID : (int?)null;
+}
+
+
     }
 }
