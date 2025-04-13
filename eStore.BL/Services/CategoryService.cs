@@ -20,6 +20,12 @@ namespace eStore.BL.Services
             _mapper = mapper;
         }
 
+                public async Task<(IEnumerable<CategoryDTO>, int)> GetAllCategories(int pageNumber, int pageSize)
+            {
+                var categories = await _categoryRepository.GetAllCategories(pageNumber, pageSize);
+                var totalRecords = await _categoryRepository.GetTotalCategoryCount();
+                return (categories, totalRecords);
+            }
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategories()
         {

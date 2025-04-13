@@ -16,5 +16,6 @@ namespace eStore.BL.Services
         Task<int> CreateOrder(OrderDTO orderModel);
         Task<bool> UpdateOrderStatus(int orderId, string status);
         Task<bool> DeleteOrder(int id);
+        Task<int?> UpdateOrder(OrderDTO order);
     }
 }

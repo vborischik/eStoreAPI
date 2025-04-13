@@ -25,17 +25,40 @@ namespace eStore.Web.Areas.Customer.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/categories
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryModel>>> GetAllCategories()
-        {
-            // Retrieve domain models from BL service.
-            var customers = await _categoryService.GetAllCategories();
-            // Map them to presentation models.
-            var customerModels = _mapper.Map<IEnumerable<CategoryModel>>(customers);
-            return Ok(customerModels);
 
+    // GET: api/categories
+        [HttpGet]
+        public async Task<ActionResult> GetAllCategories(int pageNumber = 1, int pageSize = 50)
+        {
+            if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest("Page number must be greater than zero, and page size must be between 1 and 100.");
+            }
+
+            var (categories, totalRecords) = await _categoryService.GetAllCategories(pageNumber, pageSize);
+            var categoryModels = _mapper.Map<IEnumerable<CategoryModel>>(categories);
+
+            return Ok(new
+            {
+                TotalCount = totalRecords,
+                Categories = categoryModels
+            });
         }
+
+        // GET: api/categories/list
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<object>>> GetCategoryList()
+        {
+            var (categories, _) = await _categoryService.GetAllCategories(1, int.MaxValue);
+            var categoryList = categories.Select(c => new
+            {
+                Id = c.CategoryID,
+                Name = c.CategoryName
+            });
+
+            return Ok(categoryList);
+        }
+
 
         // GET: api/categories/{id}
         [HttpGet("{id}")]
@@ -139,6 +162,8 @@ namespace eStore.Web.Areas.Customer.Controllers
                 return BadRequest();
             }
         }
+
+
 
     }
 }

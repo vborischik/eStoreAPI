@@ -53,6 +53,23 @@ namespace eStore.Web.Areas.Order.Controllers
             });
         }
 
+
+        // GET: api/orders
+       [HttpGet("statuses")]
+        public ActionResult<IEnumerable<object>> GetOrderStatuses()
+        {
+            var statuses = Enum.GetValues(typeof(Models.OrderStatus))
+                .Cast<Models.OrderStatus>()
+                .Select(s => new
+                {
+                    Id = (int)s,
+                    Name = s.ToString()
+                });
+
+            return Ok(statuses);
+        }
+
+
         // GET: api/orders/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderModel>> GetOrderById(int id)
@@ -157,6 +174,33 @@ namespace eStore.Web.Areas.Order.Controllers
             }
         }
         
+
+[HttpPut("{id}")]
+public async Task<ActionResult> UpdateOrder(int id, [FromBody] OrderModel orderModel)
+{
+    if (id != orderModel.OrderID)
+        return BadRequest("Order ID mismatch");
+
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+
+    try
+    {
+        var order = _mapper.Map<OrderDTO>(orderModel);
+        var updatedOrderId = await _orderService.UpdateOrder(order);
+
+        if (updatedOrderId.HasValue)
+            return Ok(new { OrderID = updatedOrderId.Value });
+
+        return NotFound();
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, "An error occurred: " + ex.Message);
+    }
+}
+
+
         // DELETE: api/orders/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOrder(int id)
@@ -305,6 +349,8 @@ namespace eStore.Web.Areas.Order.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
 
         #endregion
     }

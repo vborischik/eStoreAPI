@@ -45,9 +45,9 @@ namespace eStore.BL.Services
             }
 
             // Set the current price if not provided
-            if (orderDetail.Price <= 0)
+            if (orderDetail.UnitPrice <= 0)
             {
-                orderDetail.Price = product.Price;
+                orderDetail.UnitPrice = product.Price;
             }
 
             return await _orderDetailRepository.AddOrderDetail(orderDetail);

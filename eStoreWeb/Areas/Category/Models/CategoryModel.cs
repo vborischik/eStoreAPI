@@ -8,7 +8,7 @@ namespace eStore.Web.Areas.Customer.Models
         public int CategoryID { get; set; }
         [Required(ErrorMessage = "Category name is required.")]
         public string CategoryName { get; set; }
-
+         public bool IsRemoveAllowed { get; set; }
 
 
     }

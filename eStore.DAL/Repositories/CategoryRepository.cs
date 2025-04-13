@@ -68,5 +68,34 @@ namespace eStore.DAL.Repositories
 
             return t;
         }
+
+
+      public async Task<IEnumerable<CategoryDTO>> GetAllCategories(int pageNumber, int pageSize)
+{
+    var sql = @"
+        SELECT
+            c.CategoryID,
+            c.CategoryName,
+            CASE
+                WHEN COUNT(p.ProductID) = 0 THEN TRUE
+                ELSE FALSE
+            END AS IsRemoveAllowed
+        FROM Categories c
+        LEFT JOIN Products p ON p.CategoryID = c.CategoryID
+        GROUP BY c.CategoryID, c.CategoryName
+        ORDER BY c.CategoryID
+        LIMIT @PageSize OFFSET @Offset;
+    ";
+
+    return await QueryAsync<CategoryDTO>(sql, new { PageSize = pageSize, Offset = (pageNumber - 1) * pageSize });
+}
+
+
+        public async Task<int> GetTotalCategoryCount()
+        {
+            var sql = "SELECT COUNT(*) FROM Categories";
+            return await QuerySingleAsync<int>(sql);
+        }
+
     }
 }

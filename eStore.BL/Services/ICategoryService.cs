@@ -15,5 +15,9 @@ namespace eStore.BL.Services
         Task<int> AddCategory(CategoryDTO categoryModel);
         Task<CategoryDTO> UpdateCategory(CategoryDTO categoryModel);
         Task<int> DeleteCategory(int id);
+
+        Task<(IEnumerable<CategoryDTO>, int)> GetAllCategories(int pageNumber, int pageSize);
+
+
     }
 }

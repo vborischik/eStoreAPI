@@ -24,7 +24,7 @@ namespace eStore.DAL.Repositories
             parameters.Add("@p_OrderID", orderDetail.OrderID);
             parameters.Add("@p_ProductID", orderDetail.ProductID);
             parameters.Add("@p_Quantity", orderDetail.Quantity);
-            parameters.Add("@p_Price", orderDetail.Price);
+            parameters.Add("@p_Price", orderDetail.UnitPrice);
             parameters.Add("p_OrderDetailID", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             await ExecuteAsync("AddOrderDetail", parameters, commandType: CommandType.StoredProcedure);
@@ -45,7 +45,7 @@ namespace eStore.DAL.Repositories
 
         public async Task<OrderDetailDTO> GetOrderDetailById(int id)
         {
-            var sql = @"SELECT od.*, p.ProductName, p.SKU 
+            var sql = @"SELECT od.*,od.Price as UnitPrice, p.ProductName, p.SKU
                       FROM OrderDetails od
                       JOIN Products p ON od.ProductID = p.ProductID
                       WHERE od.OrderDetailID = @Id";
@@ -54,7 +54,7 @@ namespace eStore.DAL.Repositories
 
         public async Task<IEnumerable<OrderDetailDTO>> GetOrderDetailsByOrderId(int orderId)
         {
-            var sql = @"SELECT od.*, p.ProductName, p.SKU 
+            var sql = @"SELECT od.*,od.Price as UnitPrice ,  p.ProductName, p.SKU
                       FROM OrderDetails od
                       JOIN Products p ON od.ProductID = p.ProductID
                       WHERE od.OrderID = @OrderId";
@@ -67,7 +67,7 @@ namespace eStore.DAL.Repositories
             parameters.Add("p_OrderDetailID", orderDetail.OrderDetailID, DbType.Int32);
             parameters.Add("p_ProductID", orderDetail.ProductID, DbType.Int32);
             parameters.Add("p_Quantity", orderDetail.Quantity, DbType.Int32);
-            parameters.Add("p_Price", orderDetail.Price, DbType.Decimal);
+            parameters.Add("p_Price", orderDetail.UnitPrice, DbType.Decimal);
 
             return await ExecuteAsync(
                 "UpdateOrderDetail",
