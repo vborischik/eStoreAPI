@@ -1,29 +1,47 @@
-Overview
+# eStoreAPI
 
-eStoreAPI is a RESTful API designed for managing e-commerce operations, including product management, order processing, and user authentication. This project is built using .NET and follows best practices for API development.
+An ASP.NET Core-based RESTful API for e-commerce applications. This API provides endpoints for product management, user authentication, order processing, and more. It leverages Entity Framework Core for data access, JWT for secure authentication, and Swagger/OpenAPI for interactive API documentation.
 
-Features
+---
 
-User authentication and authorization
+## Table of Contents
 
-Product catalog management
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup and Installation](#setup-and-installation)
+- [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+- [Swagger / OpenAPI Documentation](#swagger--openapi-documentation)
+- [Code Documentation](#code-documentation)
+- [Additional Documentation](#additional-documentation)
+- [License](#license)
 
-Order processing and management
+---
 
-Secure payment integration
+## Features
 
-Role-based access control
+- **User Authentication:** Secure login and registration using JWT tokens.
+- **Product Management:** CRUD operations for products.
+- **Order Processing:** Create, view, and manage customer orders.
+- **Database Integration:** Using Entity Framework Core for ORM.
+- **Interactive API Documentation:** Automatic Swagger UI integration.
+- **Extensible and Modular Architecture:** Easily customizable and scalable.
 
-Logging and monitoring
+---
 
-Technologies Used
+## Requirements
 
-.NET (ASP.NET Core)
+- [.NET 6 SDK](https://dotnet.microsoft.com/download) (or later)
+- A SQL Server instance or another supported database for Entity Framework Core
+- Node.js (if you plan to use any client-side tools)
+- Git
 
-Entity Framework Core (for database interactions)
+---
 
-SQL Server (or any compatible relational database)
+## Setup and Installation
 
-JWT Authentication (for secure API access)
+1. **Clone the Repository:**
 
-Swagger (API documentation)
+   ```bash
+   git clone https://github.com/vborischik/eStoreAPI.git
+   cd eStoreAPI
