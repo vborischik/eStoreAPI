@@ -13,15 +13,18 @@ namespace eStore.BL.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IOrderDetailService _orderDetailService;
         private readonly IMapper _mapper;
 
         public OrderService(
-            IOrderRepository orderRepository,
-            IProductRepository productRepository,
-            IMapper mapper)
+             IOrderRepository orderRepository,
+             IProductRepository productRepository,
+             IOrderDetailService orderDetailService,
+             IMapper mapper)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
+            _orderDetailService = orderDetailService;
             _mapper = mapper;
         }
 
@@ -106,23 +109,54 @@ namespace eStore.BL.Services
         }
 
         public async Task<int?> UpdateOrder(OrderDTO order)
-{
-    decimal totalAmount = 0;
-    foreach (var detail in order.OrderDetails)
-    {
-        var product = await _productRepository.GetProductById(detail.ProductID);
-        if (product == null)
-            throw new Exception($"Product with ID {detail.ProductID} not found");
+        {
+            decimal totalAmount = 0;
 
-        detail.UnitPrice = product.Price;
-        totalAmount += product.Price * detail.Quantity;
-    }
+            // Get original order and details from DB
+            var existingOrder = await _orderRepository.GetOrderById(order.OrderID);
+            if (existingOrder == null || existingOrder.OrderID == 0)
+                return null;
 
-    order.TotalAmount = totalAmount;
+            var existingDetails = existingOrder.OrderDetails;
+            var updatedDetails = order.OrderDetails;
 
-    var result = await _orderRepository.UpdateOrder(order);
-    return result > 0 ? order.OrderID : (int?)null;
-}
+            // 1. Detect removed details
+            var deletedDetails = existingDetails
+                .Where(existing => !updatedDetails.Any(updated => updated.OrderDetailID == existing.OrderDetailID))
+                .ToList();
+
+            foreach (var deleted in deletedDetails)
+            {
+                await _orderDetailService.DeleteOrderDetail(deleted.OrderDetailID);
+            }
+
+            // 2. Process updated and new details
+            foreach (var detail in updatedDetails)
+            {
+                var product = await _productRepository.GetProductById(detail.ProductID);
+                if (product == null)
+                    throw new Exception($"Product with ID {detail.ProductID} not found");
+
+                detail.UnitPrice = product.Price;
+                totalAmount += detail.UnitPrice * detail.Quantity;
+
+                if (detail.OrderDetailID == 0)
+                {
+                    detail.OrderID = order.OrderID;
+                    await _orderDetailService.CreateOrderDetail(detail);
+                }
+                else
+                {
+                    await _orderDetailService.UpdateOrderDetail(detail);
+                }
+            }
+
+            // 3. Update order header
+            order.TotalAmount = totalAmount;
+            var result = await _orderRepository.UpdateOrder(order);
+
+            return result > 0 ? order.OrderID : (int?)null;
+        }
 
 
     }

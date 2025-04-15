@@ -33,8 +33,10 @@ namespace eStore.DAL.Repositories
 
         public async Task<int> DeleteOrderDetail(int id)
         {
-            var sql = "DELETE FROM OrderDetails WHERE OrderDetailID = @Id";
-            return await ExecuteAsync(sql, new { Id = id });
+            var parameters = new DynamicParameters();
+            parameters.Add("p_OrderDetailID", id, DbType.Int32);
+
+            return await ExecuteAsync("DeleteOrderDetail", parameters, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<int> DeleteOrderDetailsByOrderId(int orderId)

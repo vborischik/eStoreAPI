@@ -4,10 +4,10 @@
     "configuration" : "Debug",
     "framework"     : "net8.0",
     "self-contained" : true,
-    "application"    : "eStoreWeb",
-    "environment"    : "eStoreWeb-test",
+    "application"    : "Sample",
+    "environment"    : "Sample-env",
     "enable-xray"    : false,
     "enhanced-health-type" : "basic",
     "additional-options"   : "",
-    "proxy-server"         : "none"
+    "proxy-server"         : "nginx"
 }

@@ -52,12 +52,16 @@ namespace eStore.Web
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
-                      .AllowAnyHeader()
+                    policy.WithOrigins(
+                        "https://staging.d2lc7jh0k7c1rs.amplifyapp.com",
+                        "https://gf8r34ks26.execute-api.us-east-1.amazonaws.com/prod"
+                    )
+                    .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
                 });
             });
+
 
             // Add Auth0 Authentication
             builder.Services.AddAuthentication(options =>
